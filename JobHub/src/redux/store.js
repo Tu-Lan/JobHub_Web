@@ -25,9 +25,11 @@ const rootReducer = combineReducers({
   auth: authSlice,
   job: jobSlice,
   company: companySlice,
+  // application: applicationSlice
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
+
 
 const store = configureStore({
   reducer: persistedReducer,
@@ -38,5 +40,4 @@ const store = configureStore({
       },
     }),
 });
-
-export default store
+export default store;
