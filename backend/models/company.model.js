@@ -4,14 +4,10 @@ const companySchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
-    minlength: 3,
-    maxlength: 100
+    unique: true
   },
   description: {
     type: String,
-    maxlength: 500,
-    default: "No description available"
   },
   website: {
     type: String,
@@ -25,14 +21,11 @@ const companySchema = new mongoose.Schema({
   location: {
     type: String,
   },
+  location: {
+    type: String
+  },
   logo: {
-    type: String, // URL to company logo
-    validate: {
-      validator: function (v) {
-        return /^(ftp|http|https):\/\/[^ "]+$/.test(v);
-      },
-      message: props => `${props.value} is not a valid URL!`
-    }
+    type: String // URL to company logo
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

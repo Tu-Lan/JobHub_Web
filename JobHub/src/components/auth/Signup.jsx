@@ -136,7 +136,7 @@ const SignUp = () => {
             </RadioGroup>
             {/* Upload CV */}
             <div className='flex items-center gap-2'>
-              <Label className="whitespace-nowrap">Hồ sơ</Label>
+              <Label className="whitespace-nowrap">Avatar</Label>
               <Input
                 accept="image/*"
                 type="file"
@@ -149,7 +149,7 @@ const SignUp = () => {
           {
             loading
               ?
-              <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' />Vui lòng đợi </Button>
+              <Button className="w-full my-4"> <Loader2 className='mr-2 h-4 w-4 animate-spin' />Vui lòng đợi!! </Button>
               :
               <Button type="submit" className="w-full my-4">Đăng ký</Button>
           }

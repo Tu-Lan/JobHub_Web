@@ -5,23 +5,25 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import axios from 'axios';
-import { COMPANY_API_END_POINT } from '@/utils/constant';
+import { JOB_API_END_POINT } from '@/utils/constant';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
-import useGetCompanyById from '@/hooks/useGetCompanyById';
+import useGetAdminJobById from '@/hooks/useGetAdminJobById';
 
-const CompanySetup = () => {
+const AdminJobEdit = () => {
   const params = useParams();
-  useGetCompanyById(params.id);
+  useGetAdminJobById(params.id);
   const [input, setInput] = useState({
-    name: "",
-    description: "",
-    website: "",
-    location: "",
-    file: null
+    title: '',
+    description: '',
+    requirements: '',
+    salary: '',
+    location: '',
+    jobType: '',
+    experienceLevel: 0,
   });
-  const { singleCompany } = useSelector(store => store.company);
+  const { singleJob } = useSelector(store => store.job);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -29,32 +31,19 @@ const CompanySetup = () => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const changeFileHandler = (e) => {
-    const file = e.target.files?.[0];
-    setInput({ ...input, file });
-  };
-
   const submitHandler = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("name", input.name);
-    formData.append("description", input.description);
-    formData.append("website", input.website);
-    formData.append("location", input.location);
-    if (input.file) {
-      formData.append("file", input.file);
-    }
     try {
       setLoading(true);
-      const res = await axios.put(`${COMPANY_API_END_POINT}/update/${params.id}`, formData, {
+      const res = await axios.put(`${JOB_API_END_POINT}/update/${params.id}`, input, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         },
-        withCredentials: true
+        withCredentials: true,
       });
       if (res.data.success) {
         toast.success(res.data.message);
-        navigate("/admin/companies");
+        navigate('/admin/jobs');
       }
     } catch (error) {
       console.log(error);
@@ -66,13 +55,15 @@ const CompanySetup = () => {
 
   useEffect(() => {
     setInput({
-      name: singleCompany.name || "",
-      description: singleCompany.description || "",
-      website: singleCompany.website || "",
-      location: singleCompany.location || "",
-      file: singleCompany.file || null
+      title: singleJob.title || '',
+      description: singleJob.description || '',
+      requirements: singleJob.requirements || '',
+      salary: singleJob.salary || '',
+      location: singleJob.location || '',
+      jobType: singleJob.jobType || '',
+      experienceLevel: singleJob.experienceLevel || 0,
     });
-  }, [singleCompany]);
+  }, [singleJob]);
 
   return (
     <div>
@@ -80,24 +71,24 @@ const CompanySetup = () => {
       <div className="max-w-3xl mx-auto my-10 p-8 bg-white shadow-md rounded-lg">
         <div className="flex items-center justify-between mb-6">
           <Button
-            onClick={() => navigate("/admin/companies")}
+            onClick={() => navigate('/admin/jobs')}
             variant="outline"
             className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Trở lại</span>
           </Button>
-          <h1 className="font-bold text-2xl text-gray-800 mx-auto">Company Setup</h1>
+          <h1 className="font-bold text-2xl text-gray-800 mx-auto uppercase">Chỉnh sửa công việc</h1>
           <div className="w-16"></div> {/* Placeholder to balance the space */}
         </div>
         <form onSubmit={submitHandler}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label>Tên công ty</Label>
+              <Label>Tên công việc</Label>
               <Input
                 type="text"
-                name="name"
-                value={input.name}
+                name="title"
+                value={input.title}
                 onChange={changeEventHandler}
                 className="mt-1"
               />
@@ -113,11 +104,21 @@ const CompanySetup = () => {
               />
             </div>
             <div>
-              <Label>Website</Label>
+              <Label>Chi tiết</Label>
               <Input
                 type="text"
-                name="website"
-                value={input.website}
+                name="requirements"
+                value={input.requirements}
+                onChange={changeEventHandler}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Lương</Label>
+              <Input
+                type="number"
+                name="salary"
+                value={input.salary}
                 onChange={changeEventHandler}
                 className="mt-1"
               />
@@ -133,11 +134,22 @@ const CompanySetup = () => {
               />
             </div>
             <div>
-              <Label>Logo</Label>
+              <Label>Vị trí</Label>
               <Input
-                type="file"
-                accept="image/*"
-                onChange={changeFileHandler}
+                type="text"
+                name="jobType"
+                value={input.jobType}
+                onChange={changeEventHandler}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Kinh nghiệm làm việc</Label>
+              <Input
+                type="number"
+                name="experienceLevel"
+                value={input.experienceLevel}
+                onChange={changeEventHandler}
                 className="mt-1"
               />
             </div>
@@ -160,4 +172,4 @@ const CompanySetup = () => {
   );
 };
 
-export default CompanySetup;
+export default AdminJobEdit;
