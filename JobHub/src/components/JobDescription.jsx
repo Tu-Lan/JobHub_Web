@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from '@/utils/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSingleJob } from '@/redux/jobSlice';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
 
 const JobDescription = () => {
   const { singleJob } = useSelector(store => store.job);
@@ -17,15 +18,16 @@ const JobDescription = () => {
   const params = useParams();
   const jobId = params.id;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const applyJobHandler = async () => {
     try {
       const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, { withCredentials: true });
 
       if (res.data.success) {
-        setIsApplied(true); // Update the local state
+        setIsApplied(true); 
         const updatedSingleJob = { ...singleJob, applications: [...singleJob.applications, { applicant: user?._id }] }
-        dispatch(setSingleJob(updatedSingleJob)); // helps us to real time UI update
+        dispatch(setSingleJob(updatedSingleJob));
         toast.success(res.data.message);
 
       }
@@ -51,7 +53,15 @@ const JobDescription = () => {
     fetchSingleJob();
   }, [jobId, dispatch, user?._id]);
   return (
-    <div className='max-w-7xl mx-auto my-10'>
+    <div className='max-w-7xl mx-auto my-10 px-4 sm:px-6 lg:px-8'>
+      <Button 
+        variant="outline" 
+        className="mb-4" 
+        onClick={() => navigate(-1)}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
+      </Button>
+
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='font-bold text-xl'>{singleJob?.title}</h1>

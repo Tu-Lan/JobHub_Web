@@ -9,18 +9,20 @@ import { USER_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { setUser } from '@/redux/authSlice';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 
 const UpdateProfileDialog = ({ open, setOpen }) => {
   const [loading, setLoading] = useState(false);
   const { user } = useSelector(store => store.auth);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const [input, setInput] = useState({
-    fullName: user?.fullName,
-    email: user?.email,
-    phoneNumber: user?.phoneNumber,
-    bio: user?.profile?.bio,
-    skills: user?.profile?.skills?.join(", "),
-    file: user?.profile?.resume
+    fullName: user?.fullName || '',
+    email: user?.email || '',
+    phoneNumber: user?.phoneNumber || '',
+    bio: user?.profile?.bio || '',
+    skills: user?.profile?.skills?.join(", ") || '',
+    file: user?.profile?.resume || null
   });
 
   const dispatch = useDispatch();
@@ -36,13 +38,22 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    setShowConfirmDialog(true);
+  }
+
+  const confirmUpdate = async () => {
+    setShowConfirmDialog(false);
     const formData = new FormData();
     formData.append("fullName", input.fullName);
     formData.append("email", input.email);
     formData.append("phoneNumber", input.phoneNumber);
     formData.append("bio", input.bio);
-    formData.append("skills", input.skills);
-    if (input.file) {
+    
+    // Xử lý skills
+    const skillsArray = input.skills.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
+    formData.append("skills", JSON.stringify(skillsArray));
+    
+    if (input.file && input.file instanceof File) {
       formData.append("file", input.file);
     }
     try {
@@ -54,7 +65,15 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         withCredentials: true
       });
       if (res.data.success) {
-        dispatch(setUser(res.data.user));
+        // Ensure the user object is updated correctly
+        const updatedUser = {
+          ...res.data.user,
+          profile: {
+            ...res.data.user.profile,
+            skills: skillsArray // Make sure skills are updated as an array
+          }
+        };
+        dispatch(setUser(updatedUser));
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -64,7 +83,6 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
       setLoading(false);
     }
     setOpen(false);
-    console.log(input);
   }
 
   return (
@@ -156,6 +174,21 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận cập nhật</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn cập nhật thông tin hồ sơ của mình không?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUpdate}>Xác nhận</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -13,10 +13,15 @@ const JobCard = ({ job }) => {
     const createAt = new Date(mongodbTime);
     const currentTime = new Date();
     const timeDifference = currentTime - createAt;
-    return Math.floor(timeDifference / (1000 * 24 * 60 * 60));
+    return Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // Changed the division to correct order of operations
   };
 
   const daysAgo = React.useMemo(() => daysAgoFunction(job?.createdAt), [job?.createdAt]);
+
+  const truncateDescription = (text, maxLength = 100) => {
+    if (!text) return "";
+    return text.length > maxLength ? text.substring(0, maxLength - 15) + "..." : text;
+  };
 
   return (
     <div className='p-5 rounded-md shadow-xl bg-white border border-gray-100'>
@@ -43,14 +48,8 @@ const JobCard = ({ job }) => {
 
       <div className="flex-1 flex flex-col">
         <h1 className='font-bold text-lg my-2'>{job?.title || "Tiêu đề không có"}</h1>
-        <p className='text-sm text-gray-600' style={{
-          overflow: 'hidden',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          height: '3rem',
-          lineHeight: '1.5rem'
-        }}>
-          {job?.description || "Mô tả không có"}
+        <p className='text-sm text-gray-600'>
+          {truncateDescription(job?.description || "Mô tả không có", 50)}
         </p>
       </div>
 
@@ -65,7 +64,6 @@ const JobCard = ({ job }) => {
         <Button className="bg-[#7209b7]">Lưu vào danh sách</Button>
       </div>
     </div>
-
   );
 };
 
