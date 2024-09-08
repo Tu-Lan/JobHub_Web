@@ -67,11 +67,8 @@ const AdminJobsTable = () => {
                       <Edit2 className='w-4' aria-label="Edit job" />
                       <span>Chỉnh sửa</span>
                     </div>
-                    <div
-                      onClick={() => navigate(`/admin/jobs/${job._id}/applicants`)}
-                      className='flex items-center w-fit gap-2 cursor-pointer mt-2'
-                    >
-                      <Eye className='w-4' aria-label="View applicants" />
+                    <div onClick={() => navigate(`/admin/jobs/${job._id}/applicants`)} className='flex items-center w-fit gap-2 cursor-pointer mt-2'>
+                      <Eye className='w-4' />
                       <span>Xem người ứng tuyển</span>
                     </div>
                   </PopoverContent>
